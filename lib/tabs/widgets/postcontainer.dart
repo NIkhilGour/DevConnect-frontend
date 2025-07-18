@@ -1,21 +1,22 @@
-import 'dart:collection';
-import 'dart:ffi';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:devconnect/core/colors.dart';
 import 'package:devconnect/core/user_id_service.dart';
-import 'package:devconnect/tabs/apiServices/likeApi.dart';
-import 'package:devconnect/tabs/model/like.dart';
+import 'package:devconnect/tabs/apiServices/allpostApi.dart';
+import 'package:devconnect/tabs/apiServices/commentApi.dart';
+import 'package:devconnect/tabs/model/comment.dart';
+
 import 'package:devconnect/tabs/model/post.dart';
-import 'package:devconnect/tabs/model/user.dart';
+
 import 'package:devconnect/tabs/widgets/commentscontainer.dart';
 import 'package:devconnect/tabs/widgets/exapandabletext.dart';
+import 'package:devconnect/tabs/widgets/moreoptionspostcontainer.dart';
 import 'package:devconnect/tabs/widgets/videocontainer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Postcontainer extends StatefulWidget {
+class Postcontainer extends ConsumerStatefulWidget {
   const Postcontainer(
       {super.key,
       required this.post,
@@ -31,10 +32,10 @@ class Postcontainer extends StatefulWidget {
   final bool isliking;
   final bool isLiked;
   @override
-  State<Postcontainer> createState() => _PostcontainerState();
+  ConsumerState<Postcontainer> createState() => _PostcontainerState();
 }
 
-class _PostcontainerState extends State<Postcontainer> {
+class _PostcontainerState extends ConsumerState<Postcontainer> {
   int? currentUserId;
   bool isProcessing = false;
   @override
@@ -57,6 +58,7 @@ class _PostcontainerState extends State<Postcontainer> {
       child: Container(
         color: Colors.white,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisSize: MainAxisSize.max,
@@ -87,45 +89,76 @@ class _PostcontainerState extends State<Postcontainer> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.all(8.r),
-                  child: Container(
-                    height: 40.h,
-                    width: 80.w,
-                    decoration: BoxDecoration(
-                        color: Color(0xFF876FE8).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r)),
-                    child: GestureDetector(
-                      onTap: widget.onConnect,
-                      child: Center(
-                        child: Text(
-                          'Connect',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: seedcolor),
+                if (widget.post.userProfile!.user!.id != currentUserId)
+                  Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Container(
+                        height: 40.h,
+                        width: 80.w,
+                        decoration: BoxDecoration(
+                            color: Color(0xFF876FE8).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12.r)),
+                        child: GestureDetector(
+                          onTap: widget.onConnect,
+                          child: Center(
+                            child: widget.post.isconnected == null
+                                ? Text(
+                                    'Connect',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: seedcolor),
+                                  )
+                                : widget.post.isconnected == 'APPROVED'
+                                    ? null
+                                    : Icon(
+                                        Icons.pending_outlined,
+                                        color: seedcolor,
+                                        size: 25.r,
+                                      ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
+                      )),
+                SizedBox(
+                  width: 5.w,
                 ),
+                IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Moreoptionspostcontainer(
+                            ondelete: () {
+                              ref
+                                  .watch(projectsNotifierProvider.notifier)
+                                  .deletepostnotifier(widget.post.id!);
+                            },
+                          );
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.more_vert_outlined))
               ],
             ),
             Padding(
               padding: EdgeInsets.all(8.r),
               child: ExpandableText(
-                text: widget.post.content!,
+                text: widget.post.description!,
                 style: GoogleFonts.lato(fontWeight: FontWeight.w600),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
-              child: widget.post.fileType!.contains('image')
-                  ? CachedNetworkImage(
-                      imageUrl: widget.post.fileUrl!,
-                      height: 300.h,
-                      fit: BoxFit.contain,
-                    )
-                  : Videocontainer(url: widget.post.fileUrl!),
-            ),
+            if (widget.post.fileUrl != null)
+              Padding(
+                padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
+                child: widget.post.fileType!.contains('image')
+                    ? Center(
+                        child: CachedNetworkImage(
+                          imageUrl: widget.post.fileUrl!,
+                          height: 300.h,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    : Videocontainer(url: widget.post.fileUrl!),
+              ),
             SizedBox(
               height: 5.h,
             ),
@@ -167,35 +200,44 @@ class _PostcontainerState extends State<Postcontainer> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
+                    onTap: () async {
+                      ref.invalidate(commentsProvider(widget.post.id!));
+
+                      await showModalBottomSheet(
+                        isScrollControlled: true,
                         context: context,
                         builder: (context) {
-                          return Container();
+                          return Padding(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom),
+                              child: DraggableScrollableSheet(
+                                initialChildSize: 0.50,
+                                minChildSize: 0.3,
+                                maxChildSize: 0.95,
+                                expand: false,
+                                builder: (context, scrollController) {
+                                  return Commentscontainer(
+                                    key: ValueKey(widget.post.id), // Important!
+                                    scrollController: scrollController,
+                                    postId: widget.post.id!,
+                                  );
+                                },
+                              ));
                         },
                       );
                     },
-                    child: GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Commentscontainer();
-                          },
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.comment_outlined,
-                            size: 20.r,
-                          ),
-                          Text(
-                            'Comment',
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                          )
-                        ],
-                      ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.comment_outlined,
+                          size: 20.r,
+                        ),
+                        Text(
+                          'Comment',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        )
+                      ],
                     ),
                   ),
                 ],

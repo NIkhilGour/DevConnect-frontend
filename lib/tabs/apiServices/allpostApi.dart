@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:devconnect/core/jwtservice.dart';
 import 'package:devconnect/core/user_id_service.dart';
+import 'package:devconnect/tabs/apiServices/connecttopost.dart';
+import 'package:devconnect/tabs/apiServices/deletepostApi.dart';
 import 'package:devconnect/tabs/apiServices/likeApi.dart';
 import 'package:devconnect/tabs/model/like.dart';
 import 'package:devconnect/tabs/model/post.dart';
@@ -23,7 +26,7 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Post>>> {
       final token = await JWTService.gettoken();
       final response = await http.get(
         Uri.parse(
-            'https://devconnect-backend-2-0c3c.onrender.com/user/projects'),
+            'https://devconnect-backend-2-0c3c.onrender.com/user/userProjects'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -40,6 +43,27 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Post>>> {
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> deletepostnotifier(int postId) async {
+    final currentState = state;
+
+    int index = -1;
+    List<Post> posts = [];
+    if (currentState is AsyncData<List<Post>>) {
+      posts = [...currentState.value];
+      index = posts.indexWhere((post) => post.id == postId);
+    }
+    print(index);
+    posts.removeAt(index);
+    state = AsyncValue.data(posts);
+
+    try {
+      await deletepost(postId);
+    } catch (e) {
+      state = currentState;
+      print(e.toString());
     }
   }
 
@@ -108,6 +132,41 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Post>>> {
       }
     } else {
       _processingLikes.remove(postId);
+    }
+  }
+
+  Future<void> toggleConnectionStatus(int postId) async {
+    final currentState = state;
+    if (currentState is! AsyncData<List<Post>>) return;
+
+    final posts = [...currentState.value];
+    final index = posts.indexWhere((post) => post.id == postId);
+    if (index == -1) return;
+
+    final originalPost = posts[index];
+    final currentStatus = originalPost.isconnected;
+
+    // Optimistically update status
+    String? optimisticStatus;
+    if (currentStatus == null) {
+      optimisticStatus = "PENDING";
+    } else {
+      optimisticStatus = null;
+    }
+
+    final updatedPost = originalPost.copyWith(isconnected: optimisticStatus);
+    posts[index] = updatedPost;
+    state = AsyncValue.data(posts);
+
+    try {
+      if (optimisticStatus == "PENDING") {
+        await connectToPost(postId);
+      } else {}
+      // ✅ success, keep optimistic state
+    } catch (e) {
+      // ❌ failure, revert
+      posts[index] = originalPost;
+      state = AsyncValue.data(posts);
     }
   }
 }

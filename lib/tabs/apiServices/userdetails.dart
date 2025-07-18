@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:devconnect/auth/userdetails.dart';
 import 'package:devconnect/core/jwtservice.dart';
 import 'package:devconnect/core/user_id_service.dart';
 import 'package:devconnect/tabs/model/userdetails.dart';

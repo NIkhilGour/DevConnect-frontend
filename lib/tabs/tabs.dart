@@ -19,27 +19,35 @@ class _TabsState extends State<Tabs> {
   final PageController controller = PageController();
   int index = 0;
 
+  Map<String, dynamic>? _postData;
+
+  Future<void> _handleAddPost() async {
+    final result = await Navigator.push(context, MaterialPageRoute(
+      builder: (context) {
+        return Addpost();
+      },
+    ));
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _postData = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> screens = [
       Homescreen(
-        ontap: () {
-          controller.animateToPage(
-            1,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-
-          setState(() {
-            index = 1;
-          });
-        },
-      ),
-      Addpost(),
+          publishData: _postData,
+          ontap: () {
+            _handleAddPost();
+          }),
       Groupscreen()
     ];
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: backgroundcolor,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -98,16 +106,14 @@ class _TabsState extends State<Tabs> {
         currentIndex: index,
         selectedItemColor: seedcolor,
         onTap: (value) {
-          if (value != 1) {
-            setState(() {
-              index = value;
-              controller.animateToPage(
-                value,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            });
-          }
+          setState(() {
+            index = value;
+            controller.animateToPage(
+              value,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          });
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -121,17 +127,9 @@ class _TabsState extends State<Tabs> {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: index == 1 ? seedcolor : Colors.grey,
         ),
         onPressed: () {
-          controller.animateToPage(
-            1,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-          setState(() {
-            index = 1;
-          });
+          _handleAddPost();
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
