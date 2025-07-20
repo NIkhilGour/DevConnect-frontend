@@ -5,6 +5,7 @@ import 'package:devconnect/tabs/screens/addPost.dart';
 import 'package:devconnect/tabs/screens/drawerscreen.dart';
 import 'package:devconnect/tabs/screens/groupscreen.dart';
 import 'package:devconnect/tabs/screens/homeScreen.dart';
+import 'package:devconnect/tabs/widgets/dummy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

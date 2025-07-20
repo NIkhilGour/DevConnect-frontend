@@ -8,8 +8,10 @@ import 'package:devconnect/tabs/model/comment.dart';
 import 'package:devconnect/tabs/model/post.dart';
 
 import 'package:devconnect/tabs/widgets/commentscontainer.dart';
+import 'package:devconnect/tabs/widgets/dummy.dart';
 import 'package:devconnect/tabs/widgets/exapandabletext.dart';
 import 'package:devconnect/tabs/widgets/moreoptionspostcontainer.dart';
+import 'package:devconnect/tabs/widgets/skillsandgithubcontainer.dart';
 import 'package:devconnect/tabs/widgets/videocontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,6 +89,24 @@ class _PostcontainerState extends ConsumerState<Postcontainer> {
                             fontSize: 18.sp, fontWeight: FontWeight.w600),
                       ),
                     ),
+                    IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return SkillsAndGithubContainer(
+                                skills: widget.post.techSkills!,
+                                github: widget.post.github!,
+                              );
+                            },
+                          );
+                        },
+                        icon: Image.asset(
+                          'assets/icons/solution.png',
+                          height: 27.h,
+                          width: 27.w,
+                          color: Colors.orange,
+                        ))
                   ],
                 ),
                 if (widget.post.userProfile!.user!.id != currentUserId)
@@ -200,10 +220,8 @@ class _PostcontainerState extends ConsumerState<Postcontainer> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () async {
-                      ref.invalidate(commentsProvider(widget.post.id!));
-
-                      await showModalBottomSheet(
+                    onTap: () {
+                      showModalBottomSheet(
                         isScrollControlled: true,
                         context: context,
                         builder: (context) {
@@ -213,15 +231,13 @@ class _PostcontainerState extends ConsumerState<Postcontainer> {
                                       MediaQuery.of(context).viewInsets.bottom),
                               child: DraggableScrollableSheet(
                                 initialChildSize: 0.50,
-                                minChildSize: 0.3,
+                                minChildSize: 0.5,
                                 maxChildSize: 0.95,
                                 expand: false,
                                 builder: (context, scrollController) {
                                   return Commentscontainer(
-                                    key: ValueKey(widget.post.id), // Important!
-                                    scrollController: scrollController,
-                                    postId: widget.post.id!,
-                                  );
+                                      postId: widget.post.id!,
+                                      scrollController: scrollController);
                                 },
                               ));
                         },

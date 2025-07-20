@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:devconnect/core/colors.dart';
-import 'package:devconnect/tabs/apiServices/commentApi.dart';
+import 'package:devconnect/tabs/apiServices/commentapi.dart';
+
 import 'package:devconnect/tabs/widgets/addcommentcontainer.dart';
 import 'package:devconnect/tabs/widgets/commentslistcontainer.dart';
 import 'package:flutter/material.dart';
@@ -43,18 +44,14 @@ class _CommentscontainerState extends ConsumerState<Commentscontainer> {
           Expanded(
             child: commentsData.when(
               data: (comments) {
-                print("🟢 UI got comments: ${comments.map((c) => c.id)}");
                 if (comments.isEmpty) {
                   return const Center(child: Text('No Comments Available'));
                 }
                 return ListView.builder(
-                  key: ValueKey(comments.map((c) => c.id).join(',')),
-                  itemCount: comments.length,
                   controller: widget.scrollController,
+                  itemCount: comments.length,
                   itemBuilder: (context, index) => Commentslistcontainer(
-                      key: ValueKey(comments[index].id),
-                      postId: widget.postId,
-                      comments: comments[index]),
+                      postId: widget.postId, comments: comments[index]),
                 );
               },
               error: (_, __) =>

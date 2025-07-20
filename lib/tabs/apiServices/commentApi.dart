@@ -143,12 +143,9 @@ class CommentsNotifier extends StateNotifier<AsyncValue<List<Comment>>> {
   }
 }
 
-final commentsProvider = StateNotifierProvider.autoDispose
-    .family<CommentsNotifier, AsyncValue<List<Comment>>, int>((ref, postId) {
+final commentsProvider = StateNotifierProvider.family<CommentsNotifier,
+    AsyncValue<List<Comment>>, int>((ref, postId) {
   final notifier = CommentsNotifier(postId);
-
-  // Keep it alive even if widget is rebuilt
-  ref.keepAlive(); // ✅ important
 
   return notifier;
 });
