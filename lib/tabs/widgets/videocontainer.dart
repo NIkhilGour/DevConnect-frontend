@@ -44,7 +44,7 @@ class _VideocontainerState extends State<Videocontainer> {
               child: VideoPlayer(controller),
             )
           else
-            const CircularProgressIndicator(),
+            Center(child: const CircularProgressIndicator()),
 
           const SizedBox(height: 10),
 

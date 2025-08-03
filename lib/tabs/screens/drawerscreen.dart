@@ -4,7 +4,8 @@ import 'package:devconnect/core/jwtservice.dart';
 import 'package:devconnect/core/user_id_service.dart';
 
 import 'package:devconnect/tabs/apiServices/userdetails.dart';
-import 'package:devconnect/tabs/screens/profile_screen.dart';
+
+import 'package:devconnect/tabs/screens/profilescren.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,9 @@ class _DrawerscreenState extends ConsumerState<Drawerscreen> {
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
-                      return ProfileScreen();
+                      return ProfileScreen(
+                        userid: userprofile.user!.id!,
+                      );
                     },
                   ));
                 },

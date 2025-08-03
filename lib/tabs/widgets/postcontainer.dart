@@ -4,6 +4,7 @@ import 'package:devconnect/core/user_id_service.dart';
 import 'package:devconnect/tabs/apiServices/allpostApi.dart';
 
 import 'package:devconnect/tabs/model/post.dart';
+import 'package:devconnect/tabs/screens/profilescren.dart';
 
 import 'package:devconnect/tabs/widgets/commentscontainer.dart';
 
@@ -68,14 +69,25 @@ class _PostcontainerState extends ConsumerState<Postcontainer> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius:
-                            BorderRadius.circular(15), // Not fully circular
-                        child: CachedNetworkImage(
-                          imageUrl: widget.post.userProfile!.profilePictureUrl!,
-                          height: 40,
-                          width: 40,
-                          fit: BoxFit.cover,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return ProfileScreen(
+                                  userid: widget.post.userProfile!.user!.id!);
+                            },
+                          ));
+                        },
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(15), // Not fully circular
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                widget.post.userProfile!.profilePictureUrl!,
+                            height: 40,
+                            width: 40,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

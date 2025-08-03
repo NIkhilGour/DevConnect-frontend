@@ -10,6 +10,7 @@ import 'package:devconnect/tabs/screens/drawerscreen.dart';
 import 'package:devconnect/tabs/screens/groupscreen.dart';
 import 'package:devconnect/tabs/screens/homeScreen.dart';
 import 'package:devconnect/tabs/screens/postrequestscreen.dart';
+import 'package:devconnect/tabs/screens/searchscreen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,10 +69,33 @@ class _TabsState extends ConsumerState<Tabs> {
           appBar: AppBar(
             backgroundColor: Colors.white,
             centerTitle: true,
-            title: Image.asset(
-              'assets/DevConnect.png',
-              height: 150.h,
-              width: 150.h,
+            title: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SearchScreen(),
+                    ));
+              },
+              child: Container(
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.grey[600]),
+                    SizedBox(width: 8),
+                    Text(
+                      'Search',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
             leading: Builder(
               builder: (context) => GestureDetector(

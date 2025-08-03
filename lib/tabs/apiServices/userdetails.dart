@@ -28,3 +28,24 @@ final userdetailsprovider = FutureProvider<UserProfile>(
     }
   },
 );
+
+Future<UserProfile> getOtherUserDetails(int userId) async {
+  final token = await JWTService.gettoken();
+
+  final response = await http.get(
+    Uri.parse(
+        'https://devconnect-backend-2-0c3c.onrender.com/user/userdetails/$userId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> result = await jsonDecode(response.body);
+    final UserProfile userProfile = UserProfile.fromJson(result);
+    return userProfile;
+  } else {
+    throw Exception('Failed to fetch userdata');
+  }
+}
