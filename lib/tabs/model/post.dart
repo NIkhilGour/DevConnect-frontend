@@ -1,3 +1,4 @@
+import 'package:devconnect/tabs/model/group.dart';
 import 'package:devconnect/tabs/model/like.dart';
 import 'package:devconnect/tabs/model/user.dart';
 import 'package:devconnect/tabs/model/userdetails.dart';
@@ -16,6 +17,7 @@ class Post {
   List<Comments>? comments;
   List<TechSkills>? techSkills;
   String? isconnected;
+  Group? group;
 
   Post(
       {this.id,
@@ -30,7 +32,8 @@ class Post {
       this.commentcount,
       this.comments,
       this.techSkills,
-      this.isconnected});
+      this.isconnected,
+      this.group});
 
   Post.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -63,6 +66,7 @@ class Post {
       });
     }
     isconnected = json['isUserConnected'];
+    if (json['group'] != null) group = Group.fromJson(json['group']);
   }
 
   Map<String, dynamic> toJson() {
@@ -88,39 +92,42 @@ class Post {
     if (techSkills != null) {
       data['techSkills'] = techSkills!.map((v) => v.toJson()).toList();
     }
+    if (group != null) {
+      data['group'] = group!.toJson();
+    }
     return data;
   }
 
-  Post copyWith({
-    int? id,
-    String? description,
-    String? content,
-    String? fileUrl,
-    String? fileType,
-    String? github,
-    User? userProfile,
-    int? likecout,
-    List<Like>? likes,
-    int? commentcount,
-    List<dynamic>? comments,
-    List<String>? techSkills,
-    String? isconnected,
-  }) {
+  Post copyWith(
+      {int? id,
+      String? description,
+      String? content,
+      String? fileUrl,
+      String? fileType,
+      String? github,
+      User? userProfile,
+      int? likecout,
+      List<Like>? likes,
+      int? commentcount,
+      List<dynamic>? comments,
+      List<String>? techSkills,
+      String? isconnected,
+      Group? group}) {
     return Post(
-      id: id ?? this.id,
-      description: description ?? this.description,
-      content: content ?? this.content,
-      fileUrl: fileUrl ?? this.fileUrl,
-      fileType: fileType ?? this.fileType,
-      github: github ?? this.github,
-      userProfile: this.userProfile,
-      likecout: likecout ?? this.likecout,
-      likes: likes ?? this.likes,
-      commentcount: commentcount ?? this.commentcount,
-      comments: this.comments,
-      techSkills: this.techSkills,
-      isconnected: isconnected ?? this.isconnected,
-    );
+        id: id ?? this.id,
+        description: description ?? this.description,
+        content: content ?? this.content,
+        fileUrl: fileUrl ?? this.fileUrl,
+        fileType: fileType ?? this.fileType,
+        github: github ?? this.github,
+        userProfile: this.userProfile,
+        likecout: likecout ?? this.likecout,
+        likes: likes ?? this.likes,
+        commentcount: commentcount ?? this.commentcount,
+        comments: this.comments,
+        techSkills: this.techSkills,
+        isconnected: isconnected ?? this.isconnected,
+        group: group ?? this.group);
   }
 }
 
@@ -142,32 +149,6 @@ class TechSkills {
     return data;
   }
 }
-
-// class Likes {
-//   int? id;
-//   Post? post;
-//   User? user;
-
-//   Likes({this.id, this.post, this.user});
-
-//   Likes.fromJson(Map<String, dynamic> json) {
-//     id = json['id'];
-//     post = json['post'] != null ? Post.fromJson(json['post']) : null;
-//     user = json['user'] != null ? User.fromJson(json['user']) : null;
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data['id'] = id;
-//     if (post != null) {
-//       data['post'] = post!.toJson();
-//     }
-//     if (user != null) {
-//       data['user'] = user!.toJson();
-//     }
-//     return data;
-//   }
-// }
 
 class Comments {
   int? id;

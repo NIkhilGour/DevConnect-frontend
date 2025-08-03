@@ -78,7 +78,9 @@ class _LoginState extends State<Login> {
           setState(() {
             isauthenticating = false;
           });
+
           await SharedPreferencesService.setInt('userId', response['id']);
+
           await JWTService.addtoken(response['jwt']);
 
           if (mounted) {

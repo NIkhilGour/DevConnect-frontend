@@ -2,13 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:devconnect/core/colors.dart';
 import 'package:devconnect/core/user_id_service.dart';
 import 'package:devconnect/tabs/apiServices/allpostApi.dart';
-import 'package:devconnect/tabs/apiServices/commentApi.dart';
-import 'package:devconnect/tabs/model/comment.dart';
 
 import 'package:devconnect/tabs/model/post.dart';
 
 import 'package:devconnect/tabs/widgets/commentscontainer.dart';
-import 'package:devconnect/tabs/widgets/dummy.dart';
+
 import 'package:devconnect/tabs/widgets/exapandabletext.dart';
 import 'package:devconnect/tabs/widgets/moreoptionspostcontainer.dart';
 import 'package:devconnect/tabs/widgets/skillsandgithubcontainer.dart';
@@ -147,6 +145,8 @@ class _PostcontainerState extends ConsumerState<Postcontainer> {
                         context: context,
                         builder: (context) {
                           return Moreoptionspostcontainer(
+                            post: widget.post,
+                            userId: currentUserId!,
                             ondelete: () {
                               ref
                                   .watch(projectsNotifierProvider.notifier)

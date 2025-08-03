@@ -1,4 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:devconnect/auth/authentication_tab.dart';
+import 'package:devconnect/core/jwtservice.dart';
+import 'package:devconnect/core/user_id_service.dart';
 
 import 'package:devconnect/tabs/apiServices/userdetails.dart';
 import 'package:devconnect/tabs/screens/profile_screen.dart';
@@ -90,24 +93,44 @@ class _DrawerscreenState extends ConsumerState<Drawerscreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16.r, left: 16.r, top: 16.r),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.logout_rounded,
-                      size: 30.r,
-                      color: Colors.red,
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
-                    Text(
-                      'Logout',
-                      style: GoogleFonts.poppins(
-                          color: Colors.red,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500),
-                    )
-                  ],
+                child: GestureDetector(
+                  onTap: () async {
+                    await JWTService.deletetoken();
+                    await SharedPreferencesService.clear();
+
+                    if (context.mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return AuthenticationTab();
+                          },
+                        ),
+                        (route) {
+                          return false;
+                        },
+                      );
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.logout_rounded,
+                        size: 30.r,
+                        color: Colors.red,
+                      ),
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      Text(
+                        'Logout',
+                        style: GoogleFonts.poppins(
+                            color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],

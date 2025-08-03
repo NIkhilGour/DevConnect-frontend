@@ -26,7 +26,7 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Post>>> {
       final token = await JWTService.gettoken();
       final response = await http.get(
         Uri.parse(
-            'https://devconnect-backend-2-0c3c.onrender.com/user/userProjects'),
+            'https://devconnect-backend-2-0c3c.onrender.com/user/projects'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

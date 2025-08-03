@@ -298,6 +298,13 @@ class _UserdetailsState extends State<Userdetails> {
                         EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
                   ),
                   onPressed: () async {
+                    if (image == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text("Please select profile picture")),
+                      );
+                      return;
+                    }
                     if (_formKey.currentState!.validate()) {
                       if (dob == null) {
                         ScaffoldMessenger.of(context).showSnackBar(

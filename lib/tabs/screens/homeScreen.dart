@@ -56,9 +56,10 @@ class _HomescreenState extends ConsumerState<Homescreen> {
         });
       }
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to publish: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to publish: $e')));
+      }
 
       setState(() {
         _isPublishing = false;
